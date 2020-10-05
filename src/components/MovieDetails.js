@@ -59,6 +59,7 @@ function MovieDetails({ match }) {
       }
     }
   `;
+  
   const [
     updateTodo,
     { loading: mutationLoading, error: mutationError },
