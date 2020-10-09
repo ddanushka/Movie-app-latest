@@ -38,6 +38,16 @@ const useStyles = makeStyles((theme) => ({
 
 function MovieAddEdit({ match }) {
   const classes = useStyles();
+  const handleChangeMultiselect = function(e) {
+    var options = e.target.options;
+    var value = [];
+    //for (var i = 0, l = options.length; i < l; i++) {
+      //if (options[i].selected) {
+       // value.push(options[i].value);
+      //}
+    //}
+    console.log(options)
+  }
 
   const GetMovie = gql`
   {
@@ -96,8 +106,7 @@ function MovieAddEdit({ match }) {
       <div>
         <Toolbar />
         <Toolbar />
-        <Beforeunload onBeforeunload={(event) => event.preventDefault()} />
-
+        <Beforeunload onBeforeunload={(event) => alert("closing")} />
         <CircularProgress />
       </div>
     );
@@ -119,7 +128,7 @@ function MovieAddEdit({ match }) {
 
           <div key={id}>
             <Toolbar />
-            <Toolbar />
+            <Toolbar beforeunload={alert()}/>
 
             <Container key={id}>
               <Paper className={classes.movieView}>
@@ -209,7 +218,7 @@ function MovieAddEdit({ match }) {
                         {movie_genres.map((genre) =>
                           genArry.push(genre.genre.id)
                         )}
-                        <select multiple={true} defaultValue={genArry}>
+                        <select multiple={true} defaultValue={genArry} onClick={handleChangeMultiselect}>
                           {genreData.genres.map((genre) => (
                             <option value={genre.id} key={genre.id}>
                               {genre.title}
