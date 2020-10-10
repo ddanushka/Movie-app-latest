@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation } from "react-apollo";
 import gql from "graphql-tag";
 import { Link } from "react-router-dom";
@@ -14,7 +14,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import { makeStyles } from "@material-ui/core/styles";
 import "../App.css";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
-import { Beforeunload } from 'react-beforeunload';
+//import { Beforeunload } from "react-beforeunload";
 
 const useStyles = makeStyles((theme) => ({
   movieView: {
@@ -36,9 +36,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function MovieAddEdit({ match }) {
-  const classes = useStyles();
 
+
+function MovieAddEdit({ match }) {
+  const [isChanged, setIsChanged] = useState(0);
+  const classes = useStyles();
+  const handleChangeMultiselect = function (e) {
+    var options = e.target.options;
+    var value = [];
+    //for (var i = 0, l = options.length; i < l; i++) {
+    //if (options[i].selected) {
+    // value.push(options[i].value);
+    //}
+    //}
+    console.log(options);
+  };
   const GetMovie = gql`
   {
     movies(where: {id: {_eq: ${match.params.id}}}) {
@@ -96,11 +108,16 @@ function MovieAddEdit({ match }) {
       <div>
         <Toolbar />
         <Toolbar />
-        <Beforeunload onBeforeunload={(event) => event.preventDefault()} />
-
         <CircularProgress />
       </div>
     );
+  window.addEventListener("beforeunload", (ev) => {
+    if(isChanged === 1){
+    ev.preventDefault();
+    return (ev.returnValue = "Are you sure you want to close?");
+  }
+    
+  });
   if (queryError || GenreError) return <p>Error :(</p>;
 
   return (
@@ -147,17 +164,19 @@ function MovieAddEdit({ match }) {
                         released: released,
                       },
                     });
+                    setIsChanged(0);
                   }}
                 >
                   <Grid container spacing={3}>
                     <Grid item xs={8}>
-                      <label className="form-label">Title </label>
+                <label className="form-label">Title {isChanged}</label>
                       <input
                         required
                         defaultValue={title}
                         type="text"
                         onChange={(e) => {
                           title = e.target.value;
+                          setIsChanged(1);
                         }}
                       />
                     </Grid>
@@ -168,6 +187,7 @@ function MovieAddEdit({ match }) {
                         defaultValue={synopsis}
                         onChange={(e) => {
                           synopsis = e.target.value;
+                          setIsChanged(1);
                         }}
                       />
                     </Grid>
@@ -178,6 +198,7 @@ function MovieAddEdit({ match }) {
                         defaultValue={description}
                         onChange={(e) => {
                           description = e.target.value;
+                          setIsChanged(1);
                         }}
                       />
                     </Grid>
@@ -189,6 +210,7 @@ function MovieAddEdit({ match }) {
                         defaultValue={thumbnail}
                         onChange={(e) => {
                           thumbnail = e.target.value;
+                          setIsChanged(1);
                         }}
                       />
                     </Grid>
@@ -200,6 +222,7 @@ function MovieAddEdit({ match }) {
                         type="date"
                         onChange={(e) => {
                           released = e.target.value;
+                          setIsChanged(1);
                         }}
                       />
                     </Grid>
@@ -209,7 +232,11 @@ function MovieAddEdit({ match }) {
                         {movie_genres.map((genre) =>
                           genArry.push(genre.genre.id)
                         )}
-                        <select multiple={true} defaultValue={genArry}>
+                        <select
+                          multiple={true}
+                          defaultValue={genArry}
+                          onClick={handleChangeMultiselect}
+                        >
                           {genreData.genres.map((genre) => (
                             <option value={genre.id} key={genre.id}>
                               {genre.title}

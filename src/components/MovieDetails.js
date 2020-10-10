@@ -120,6 +120,8 @@ function MovieDetails({ match }) {
           if (error) return <p>An Error Occured!</p>;
 
           return data.movies.map((movieView) => (
+            movieView === null?
+            console.log("erro"):
             <MovieView
               key={movieView.id}
               getClick={getClick}
