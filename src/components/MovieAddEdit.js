@@ -14,7 +14,6 @@ import Toolbar from "@material-ui/core/Toolbar";
 import { makeStyles } from "@material-ui/core/styles";
 import "../App.css";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
-//import { Beforeunload } from "react-beforeunload";
 
 const useStyles = makeStyles((theme) => ({
   movieView: {
@@ -36,21 +35,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
-
 function MovieAddEdit({ match }) {
   const [isChanged, setIsChanged] = useState(0);
+  const [multiGenre, setMultiGenre] = useState();
   const classes = useStyles();
-  const handleChangeMultiselect = function (e) {
-    var options = e.target.options;
-    var value = [];
-    //for (var i = 0, l = options.length; i < l; i++) {
-    //if (options[i].selected) {
-    // value.push(options[i].value);
-    //}
-    //}
-    console.log(options);
-  };
+
   const GetMovie = gql`
   {
     movies(where: {id: {_eq: ${match.params.id}}}) {
@@ -86,6 +75,23 @@ function MovieAddEdit({ match }) {
       }
     
   `;
+
+  const AddGenre = gql`
+    mutation AddGenre($genre_id: Int!, $movie_id: Int) {
+      insert_movie_genre(
+        objects: { genre_id: $genre_id, movie_id: $movie_id }
+      ) {
+        affected_rows
+      }
+    }
+  `;
+  const RemoveGenre = gql`
+    mutation RemoveGenre($_eq: Int) {
+      delete_movie_genre(where: { movie_id: { _eq: $_eq } }) {
+        affected_rows
+      }
+    }
+  `;
   //const match = this.match;
   const {
     loading: queryLoading,
@@ -102,6 +108,21 @@ function MovieAddEdit({ match }) {
     { loading: mutationLoading, error: mutationError },
   ] = useMutation(UpdateMovie);
 
+  const [
+    addGenre,
+    { loading: mutategenreLoading, error: mutategenreError },
+  ] = useMutation(AddGenre);
+  const [removeGenre] = useMutation(RemoveGenre);
+  const handleChangeMultiselect = (e) => {
+    let target = e.target;
+    let name = target.name;
+    //here
+    let value = Array.from(target.selectedOptions, (option) => option.value);
+    setMultiGenre({
+     genre:value,
+    });
+    
+  };
   const genArry = [];
   if (queryLoading || GenreLoading)
     return (
@@ -112,11 +133,10 @@ function MovieAddEdit({ match }) {
       </div>
     );
   window.addEventListener("beforeunload", (ev) => {
-    if(isChanged === 1){
-    ev.preventDefault();
-    return (ev.returnValue = "Are you sure you want to close?");
-  }
-    
+    if (isChanged === 1) {
+      ev.preventDefault();
+      return (ev.returnValue = "Are you sure you want to close?");
+    }
   });
   if (queryError || GenreError) return <p>Error :(</p>;
 
@@ -147,6 +167,7 @@ function MovieAddEdit({ match }) {
                       <Toolbar />
                       <Toolbar />
                       <CircularProgress />
+                      
                     </div>
                   )}
                   {mutationError && <p>Error :( Please try again</p>}
@@ -165,11 +186,30 @@ function MovieAddEdit({ match }) {
                       },
                     });
                     setIsChanged(0);
-                  }}
+                    removeGenre({
+                      variables: {
+                        _eq: match.params.id,
+                      },
+                    })
+                    console.log("removed");
+                
+                    if (!(typeof(multiGenre) === "undefined")) {
+                      console.log(multiGenre);
+                      multiGenre.genre.map((genre) => (
+                        addGenre({
+                          variables: {
+                            movie_id:match.params.id,
+                            genre_id:genre,
+                          }
+                        })
+                      ))
+                    }
+                  }
+                }
                 >
                   <Grid container spacing={3}>
                     <Grid item xs={8}>
-                <label className="form-label">Title {isChanged}</label>
+                      <label className="form-label">Title</label>
                       <input
                         required
                         defaultValue={title}
@@ -235,7 +275,8 @@ function MovieAddEdit({ match }) {
                         <select
                           multiple={true}
                           defaultValue={genArry}
-                          onClick={handleChangeMultiselect}
+                          name="selectOptions"
+                          onChange={handleChangeMultiselect}
                         >
                           {genreData.genres.map((genre) => (
                             <option value={genre.id} key={genre.id}>

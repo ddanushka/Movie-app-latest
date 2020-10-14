@@ -38,6 +38,15 @@ const useStyles = makeStyles((theme) => ({
 
 function AddNewMovie() {
   const classes = useStyles();
+  const [id, setId] = useState();
+  const [title, setTitle] = useState("");
+  const [synopsis, setSynopsis] = useState();
+  const [description, setDescription] = useState();
+  const [thumbnail, setThumbnail] = useState();
+  const [released, setReleased] = useState();
+  const [multiGenre, setMultiGenre] = useState();
+  const [idAvailable, setidAvailable] = useState(0);
+
   const GetAllGenre = gql`
     {
       genres {
@@ -50,7 +59,6 @@ function AddNewMovie() {
   const AddMovie = gql`
     mutation AddMovie(
       $id: Int!
-      $genre_id: Int
       $released: date
       $synopsis: String
       $thumbnail: String
@@ -65,7 +73,6 @@ function AddNewMovie() {
           synopsis: $synopsis
           thumbnail: $thumbnail
           title: $title
-          movie_genres: { data: { genre_id: $genre_id } }
         }
       ) {
         id
@@ -73,14 +80,39 @@ function AddNewMovie() {
       }
     }
   `;
-  
+
   const AddGenre = gql`
     mutation AddGenre($genre_id: Int!, $movie_id: Int) {
-      insert_movie_genre(objects: {genre_id: $genre_id, movie_id: $movie_id}) {
+      insert_movie_genre(
+        objects: { genre_id: $genre_id, movie_id: $movie_id }
+      ) {
         affected_rows
       }
     }
   `;
+  const RemoveGenre = gql`
+    mutation RemoveGenre($_eq: Int = 6) {
+      delete_movie_genre(where: { movie_id: { _eq: $_eq } }) {
+        affected_rows
+      }
+    }
+  `;
+
+  const onCompete = () => {
+    if (!(typeof multiGenre === "undefined")) {
+      multiGenre.genre.map(
+        (genre) => (
+          console.log(genre),
+          addGenre({
+            variables: {
+              movie_id: id,
+              genre_id: genre,
+            },
+          })
+        )
+      );
+    }
+  };
   const {
     loading: GenreLoading,
     error: GenreError,
@@ -90,31 +122,31 @@ function AddNewMovie() {
   const [
     addMovie,
     { loading: mutationLoading, error: mutationError, data: feeback },
-  ] = useMutation(AddMovie);
+  ] = useMutation(AddMovie, {
+    onCompleted: onCompete,
+  });
 
   const [
     addGenre,
-    { loading: mutategenreLoading, error: mutategenreError},
+    { loading: mutategenreLoading, error: mutategenreError },
   ] = useMutation(AddGenre);
-
-  const [id, setId] = useState(0);
-  const [title, setTitle] = useState("");
-  const [synopsis, setSynopsis] = useState();
-  const [description, setDescription] = useState();
-  const [thumbnail, setThumbnail] = useState();
-  const [released, setReleased] = useState();
-  const [genre_id, setGenre_id] = useState();
+  const [removeGenre] = useMutation(RemoveGenre);
 
   const GetAllId = gql`
-    {
-        movies(where: {id: {_eq: ${id}}}) {
-            id
-        }
-    }
+    {movies_by_pk(id: ${id > 0 ? id : 0}) {
+      id
+    }}
     `;
-
   const { data: idData } = useQuery(GetAllId);
-
+  const handleChangeMultiselect = (e) => {
+    let target = e.target;
+    let name = target.name;
+    //here
+    let value = Array.from(target.selectedOptions, (option) => option.value);
+    setMultiGenre({
+      genre: value,
+    });
+  };
   if (GenreLoading || mutategenreLoading)
     return (
       <div>
@@ -154,10 +186,8 @@ function AddNewMovie() {
                   description: description,
                   thumbnail: thumbnail,
                   released: released,
-                  genre_id: genre_id,
                 },
               });
-              
             }}
           >
             <Grid container spacing={3}>
@@ -167,11 +197,23 @@ function AddNewMovie() {
                   required
                   type="number"
                   onChange={(e) => {
+                    console.log(e.target.value);
                     setId(e.target.value);
-                    console.log(e.target.value)
-                    idData.movies.map((id) => console.log(id) );
+                    //idData.movies_by_pk.map((id) => console.log(id ) );
                   }}
                 />
+                {
+                  
+                  !(typeof idData === "undefined") ? (
+                    idData.movies_by_pk === null ? (
+                      ""
+                    ) : (
+                      <span>{id} ID Already exist</span>
+                    )
+                  ) : (
+                    ""
+                  )
+                }
               </Grid>
               <Grid item xs={8}>
                 <label className="form-label">Title </label>
@@ -227,9 +269,7 @@ function AddNewMovie() {
                   <select
                     required
                     multiple={true}
-                    onChange={(e) => {
-                      setGenre_id(e.target.value);
-                    }}
+                    onChange={handleChangeMultiselect}
                   >
                     {genreData.genres.map((genre) => (
                       <option value={genre.id} key={genre.id}>
