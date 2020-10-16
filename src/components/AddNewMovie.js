@@ -34,18 +34,26 @@ const useStyles = makeStyles((theme) => ({
   expandOpen: {
     transform: "rotate(180deg)",
   },
+  inputerror: {
+    color: "white",
+    marginTop: "5px",
+    background: "#ff6767",
+    display: "block",
+    padding: "2px 5px",
+    fontSize: "12px"
+  }
 }));
 
 function AddNewMovie() {
   const classes = useStyles();
-  const [id, setId] = useState();
+  const [id, setId] = useState(100000);
   const [title, setTitle] = useState("");
   const [synopsis, setSynopsis] = useState();
   const [description, setDescription] = useState();
   const [thumbnail, setThumbnail] = useState();
   const [released, setReleased] = useState();
   const [multiGenre, setMultiGenre] = useState();
-  const [idAvailable, setidAvailable] = useState(0);
+  const [idAvailable, setidAvailable] = useState(false);
 
   const GetAllGenre = gql`
     {
@@ -138,6 +146,7 @@ function AddNewMovie() {
     }}
     `;
   const { data: idData } = useQuery(GetAllId);
+  
   const handleChangeMultiselect = (e) => {
     let target = e.target;
     let name = target.name;
@@ -178,16 +187,22 @@ function AddNewMovie() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              addMovie({
-                variables: {
-                  id: id,
-                  title: title,
-                  synopsis: synopsis,
-                  description: description,
-                  thumbnail: thumbnail,
-                  released: released,
-                },
-              });
+              if(!(typeof idData === "undefined")){
+
+                if((idData.movies_by_pk === null)){
+                  
+                 addMovie({
+                   variables: {
+                     id: id,
+                     title: title,
+                     synopsis: synopsis,
+                     description: description,
+                     thumbnail: thumbnail,
+                     released: released,
+                   },
+                 })
+                 
+              }}
             }}
           >
             <Grid container spacing={3}>
@@ -208,7 +223,7 @@ function AddNewMovie() {
                     idData.movies_by_pk === null ? (
                       ""
                     ) : (
-                      <span>{id} ID Already exist</span>
+                      <span className={classes.inputerror}>{id} ID Already exist</span>
                     )
                   ) : (
                     ""
