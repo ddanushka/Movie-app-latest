@@ -59,11 +59,13 @@ function MovieDetails({ match }) {
       }
     }
   `;
-  
+  const goToHome = () =>window.location = '/';
   const [
     updateTodo,
     { loading: mutationLoading, error: mutationError },
-  ] = useMutation(DeleteMovie);
+  ] = useMutation(DeleteMovie,{
+    onCompleted : goToHome
+  });
 
   const getClick = () => {
     updateTodo({
