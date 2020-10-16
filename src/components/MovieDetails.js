@@ -59,7 +59,7 @@ function MovieDetails({ match }) {
       }
     }
   `;
-  const goToHome = () =>window.location = '/';
+  const goToHome = () =>window.location = '/MovieListPage/all';
   const [
     updateTodo,
     { loading: mutationLoading, error: mutationError },
