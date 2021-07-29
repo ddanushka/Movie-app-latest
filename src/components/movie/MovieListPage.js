@@ -7,13 +7,13 @@ import GridListTile from "@material-ui/core/GridListTile";
 import ListSubheader from "@material-ui/core/ListSubheader";
 import Toolbar from "@material-ui/core/Toolbar";
 //import MovieItem from './MovieItem';
-import SidePanel from "./SidePanel";
+import SidePanel from "../layout/SidePanel";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
 import {Link} from "react-router-dom";
 
-const MovieItem = React.lazy(() => import("./MovieItem"));
+const MovieItem = React.lazy(() => import("../movie/MovieItem"));
 
 const useStyles = makeStyles((theme) => ({
   pageWrapper: {
@@ -27,8 +27,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
   },
   gridList: {
-    minWidth: "calc(100vw - 290px)",
-    minheight: "calc(100vh - 120px)",
+    minWidth: "calc(100vw - 310px)",
+    minHeight: "calc(100vh - 120px)",
   },
   icon: {
     color: "rgba(255, 255, 255, 0.54)",

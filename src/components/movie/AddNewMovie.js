@@ -12,7 +12,7 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import CardActions from "@material-ui/core/CardActions";
 import Toolbar from "@material-ui/core/Toolbar";
 import { makeStyles } from "@material-ui/core/styles";
-import "../App.css";
+import "../../App.css";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import { Beforeunload } from "react-beforeunload";
 

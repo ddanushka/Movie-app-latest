@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronLeft from "@material-ui/icons/ChevronLeft";
 import { Link } from "react-router-dom";
-import "../App.css";
+import "../../App.css";
 
 const useStyles = makeStyles((theme) => ({
   appBar: {

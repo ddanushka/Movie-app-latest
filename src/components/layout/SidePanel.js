@@ -61,11 +61,6 @@ function SidePanel(props) {
           </List>
           <Divider />
           <List>
-              <Link to={"/MovieListPage/all"}>
-              <ListItem button>
-                <ListItemText primary="All movies" />
-              </ListItem>
-              </Link>
               <Query query={gql`
                   {
                     genres {
@@ -73,19 +68,29 @@ function SidePanel(props) {
                       title
                     }
                   }
-                `}>
+                  `}>
 
-                  {({loading, error, data}) =>{
+                  {
+                  ({loading, error, data}) =>{
                     if (loading) return <div className={classes.spinner}><CircularProgress /></div>;
                     if (error) return <ListItem><ListItemText primary={"An Error Occured!"} /></ListItem>;
 
-                    return data.genres.map(({id, title})=> (
+                    return (
+                      
+                    <Link to={"/MovieListPage/all"}>
+                      <ListItem button>
+                        <ListItemText primary="All movies" />
+                      </ListItem>
+                    </Link>,
+                    data.genres.map(({id, title})=> (
                       <Link key={id} to={`/MovieListPage/${id}`}><ListItem button key={id}>
                         <ListItemText primary={title} />
                         </ListItem>
                       </Link>
                       
-                    ))
+                      ))
+                    
+                    )
                   }}
               </Query>
           </List>

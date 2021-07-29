@@ -9,7 +9,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Fab from "@material-ui/core/Fab";
 import AddIcon from "@material-ui/icons/Add";
 import { Link } from "react-router-dom";
-import "../App.css";
+import "../../App.css";
 
 const useStyles = makeStyles((theme) => ({
   pageWrapper: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
   gridList: {
     minWidth: "calc(100vw - 290px)",
-    minheight: "calc(100vh - 120px)",
+    minHeight: "calc(100vh - 120px)",
   },
   icon: {
     color: "rgba(255, 255, 255, 0.54)",

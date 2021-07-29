@@ -2,14 +2,14 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import Header from "./components/Header";
-import MovieListPage from "./components/MovieListPage";
-import MovieDetails from "./components/MovieDetails";
-import MovieAddEdit from "./components/MovieAddEdit";
+import Header from "./components/layout/Header";
+import MovieListPage from "./components/movie/MovieListPage";
+import MovieDetails from "./components/movie/MovieDetails";
+import MovieAddEdit from "./components/movie/MovieAddEdit";
 import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "react-apollo";
-import AddNewMovie from "./components/AddNewMovie";
-import GenreAddEdit from "./components/GenreAddEdit"
+import AddNewMovie from "./components/movie/AddNewMovie";
+import GenreAddEdit from "./components/genre/GenreAddEdit"
 
 
 const client = new ApolloClient({
